@@ -70,6 +70,7 @@ public class ReadFile : MonoBehaviour
          
     }
 
+  
     void ReadCSV()
     {
         string path = "Assets/Resources/SampleCSVFile_2kb.csv";
