@@ -2,7 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.AI;
-public enum EMinionState { Walking,Chase,Attack}
+public enum EMinionState { Walking,Chase,Attack,Dead}
 public class Minion : MonoBehaviour, IDamageable
 {
 
@@ -12,7 +12,7 @@ public class Minion : MonoBehaviour, IDamageable
     public float detectionArea = 4f;
     public float attackRange = 2f;
     public float attackCooldown = 1f;
-
+    public float hp = 10f;
     public GameObject currentTarget;
     Transform targetCore;
 
@@ -32,15 +32,25 @@ public class Minion : MonoBehaviour, IDamageable
         team = myTeam;
         targetCore = OtherCore;
 
-        agent.Warp(transform.position);
+        GetComponentInChildren<SkinnedMeshRenderer>().material.color = team == ETeams.TeamA ? Color.white : Color.red;
+
+
+        //agent.Warp(transform.position);
         StartCoroutine(BehaviourTree());
     }
 
 
     IEnumerator BehaviourTree()
     {
+       
+
         do
         {
+            if (gameObject == null)
+            {
+                yield break;
+            }
+
             switch (currentState)
             {
                 case EMinionState.Walking:
@@ -128,6 +138,18 @@ public class Minion : MonoBehaviour, IDamageable
 
     public void ApplyDamage(float Damage)
     {
-        
+        if (currentState == EMinionState.Dead) return;
+
+        hp -= Damage;
+        if(hp<=0)
+        {
+            SetDead();
+        }
+    }
+    public virtual void SetDead()
+    {
+        currentState = EMinionState.Dead;
+        StopAllCoroutines();
+        Destroy(gameObject);
     }
 }

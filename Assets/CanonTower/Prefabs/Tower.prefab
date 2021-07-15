@@ -276,9 +276,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b43e8357527d1ce4d9cead55f1bf6828, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  team: 1
+  team: 0
   Hp: 50
   hpText: {fileID: 3622953176558610625}
+  detectionArea: 14
+  attackCooldown: 1
+  currentTarget: {fileID: 0}
+  projectilePrefab: {fileID: 1279243299522496557, guid: 1a2a1e59365ab0048826c5b51aa470ab, type: 3}
 --- !u!1 &171538
 GameObject:
   m_ObjectHideFlags: 0
