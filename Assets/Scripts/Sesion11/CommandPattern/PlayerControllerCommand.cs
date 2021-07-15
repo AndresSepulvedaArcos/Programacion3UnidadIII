@@ -12,6 +12,14 @@ public class PlayerControllerCommand : MonoBehaviour,IDamageable
    
     public Queue<Vector3> waypoints = new Queue<Vector3>();
     public List<Vector3> waypointsToView;
+
+    public ETeams team;
+
+    public GameObject basicAttackPrefab;
+    public float attackRange = 15f;
+    bool basicIsInCooldown;
+    public float basicCooldown = 0.5f;
+
     private void Awake()
     {
         agent = GetComponent<NavMeshAgent>();
@@ -29,7 +37,30 @@ public class PlayerControllerCommand : MonoBehaviour,IDamageable
         if(Physics.Raycast(ray,out hit))
         {
 
-            agent.SetDestination(hit.point);
+            if(hit.transform.GetComponent<IDamageable>()==null)
+            {
+                agent.SetDestination(hit.point);
+                agent.isStopped = false;
+            }
+            else
+            {
+                if(hit.transform.GetComponent<IDamageable>().GetTeam()!=team)
+                {
+                    if((hit.transform.position-transform.position).magnitude>attackRange)
+                    {
+                        agent.isStopped = false;
+                        agent.SetDestination(hit.point);
+                        
+                    }
+                    else
+                    {
+                        agent.isStopped = true;
+                        MakeBasicAttack(hit.transform);
+                    }
+                   
+                }
+            }
+             
             
 
         }
@@ -59,11 +90,27 @@ public class PlayerControllerCommand : MonoBehaviour,IDamageable
 
     public ETeams GetTeam()
     {
-        return ETeams.TeamB;
+        return team;
     }
 
     public void ApplyDamage(float Damage)
     {
          
+    }
+
+    public void MakeBasicAttack(Transform attackTarget)
+    {
+        if (basicIsInCooldown) return;
+
+        GameObject projectile= Instantiate(basicAttackPrefab, transform.position, Quaternion.identity);
+        projectile.GetComponent<PlayerBasicAttack>().ShootTo(attackTarget);
+        basicIsInCooldown = true;
+        StartCoroutine(ResetBasicAttackCooldown());
+    }
+
+    IEnumerator ResetBasicAttackCooldown()
+    {
+        yield return new WaitForSeconds(basicCooldown);
+        basicIsInCooldown = false;
     }
 }
