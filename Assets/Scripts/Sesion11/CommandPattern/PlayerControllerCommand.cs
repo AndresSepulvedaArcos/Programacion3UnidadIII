@@ -3,11 +3,12 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.AI;
 
-public class PlayerControllerCommand : MonoBehaviour
+public class PlayerControllerCommand : MonoBehaviour,IDamageable
 {
     //FIFO LIFO
 
     NavMeshAgent agent;
+
    
     public Queue<Vector3> waypoints = new Queue<Vector3>();
     public List<Vector3> waypointsToView;
@@ -27,9 +28,9 @@ public class PlayerControllerCommand : MonoBehaviour
         RaycastHit hit;
         if(Physics.Raycast(ray,out hit))
         {
-            waypoints.Enqueue(hit.point);
-            DisplayQueue();
 
+            agent.SetDestination(hit.point);
+            
 
         }
 
@@ -39,8 +40,7 @@ public class PlayerControllerCommand : MonoBehaviour
     void DisplayQueue()
     {
         waypointsToView.Clear();
-        waypointsToView.AddRange(waypoints.ToArray());
-
+        waypointsToView.AddRange(waypoints.ToArray()); 
     }
     void MoveToNextWaypoint()
     {
@@ -54,6 +54,16 @@ public class PlayerControllerCommand : MonoBehaviour
         {
             AddActionToQueue();
         }
+         
+    }
+
+    public ETeams GetTeam()
+    {
+        return ETeams.TeamB;
+    }
+
+    public void ApplyDamage(float Damage)
+    {
          
     }
 }
