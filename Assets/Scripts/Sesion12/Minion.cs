@@ -46,7 +46,7 @@ public class Minion : MonoBehaviour, IDamageable
 
         do
         {
-            if (gameObject == null)
+            if (gameObject == null )
             {
                 StopAllCoroutines();
                 yield break;
@@ -59,7 +59,13 @@ public class Minion : MonoBehaviour, IDamageable
                     CheckTarget();
                     break;
                 case EMinionState.Chase:
+                    if (currentTarget == null)
+                    {
+                        currentState = EMinionState.Walking;
+                        break;
+                    }
                     CheckAttackRange();
+
                     agent.SetDestination(currentTarget.transform.position);
                    
                     break;
@@ -101,11 +107,7 @@ public class Minion : MonoBehaviour, IDamageable
 
     void CheckAttackRange()
     {
-        if (currentTarget == null)
-        {
-            currentState = EMinionState.Walking;
-            return;
-        }
+       
         if ((currentTarget.transform.position-transform.position).magnitude< attackRange)
         {
             currentState = EMinionState.Attack;

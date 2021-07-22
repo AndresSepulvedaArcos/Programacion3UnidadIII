@@ -10,30 +10,45 @@ public class ProjectileBase : MonoBehaviour
     public float projectileSpeed = 10f;
     public float baseDamage = 5f;
 
+    PlayerControllerCommand player;
+
     private void Awake()
     {
         rb = GetComponent<Rigidbody>();
 
     }
-    // Start is called before the first frame update
-    void Start()
-    {
-
-    }
+   
     public void ShootTo(Transform targetToFollow)
     {
         target = targetToFollow;
     }
 
+    public void ShootToDirection(Vector3 Direction,PlayerControllerCommand Instigator=null)
+    {
+        rb.velocity = Direction * projectileSpeed;
+
+        player = Instigator;
+    }
     private void OnTriggerEnter(Collider other)
     {
-        if (target == null) return;
-
-        if (other.transform.GetInstanceID() == target.GetInstanceID())
+        IDamageable damageable = other.GetComponent<IDamageable>();
+        if (target != null)
         {
-            other.GetComponent<IDamageable>()?.ApplyDamage(baseDamage);
-            DestroyProjectile();
+            if (other.transform.GetInstanceID() == target.GetInstanceID())
+            {
+                damageable?.ApplyDamage(baseDamage);
+                DestroyProjectile();
+            }
+        }else if(player!=null && damageable!=null)
+        {
+            if(player.GetTeam()!= damageable?.GetTeam())
+            {
+                damageable?.ApplyDamage(baseDamage);
+                DestroyProjectile();
+            }
         }
+
+       
     }
 
     void DestroyProjectile()

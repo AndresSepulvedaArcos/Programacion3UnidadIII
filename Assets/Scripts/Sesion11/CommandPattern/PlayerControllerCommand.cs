@@ -20,6 +20,9 @@ public class PlayerControllerCommand : MonoBehaviour,IDamageable
     bool basicIsInCooldown;
     public float basicCooldown = 0.5f;
 
+    public PlayerAbility[] abilities;
+
+
     private void Awake()
     {
         agent = GetComponent<NavMeshAgent>();
@@ -27,7 +30,22 @@ public class PlayerControllerCommand : MonoBehaviour,IDamageable
     // Start is called before the first frame update
     void Start()
     {
-        
+        InitializeAbilities();
+    }
+
+    void OnDisable()
+    {
+        SkillInput.OnSkillInputPress -= SkillInput_OnSkillInputPress;
+    }
+
+    void OnEnable()
+    {
+        SkillInput.OnSkillInputPress += SkillInput_OnSkillInputPress;
+    }
+
+    private void SkillInput_OnSkillInputPress(int SkillIndexInput)
+    {
+        TryToExecuteAbility(SkillIndexInput);
     }
 
     void AddActionToQueue()
@@ -86,8 +104,24 @@ public class PlayerControllerCommand : MonoBehaviour,IDamageable
             AddActionToQueue();
         }
          
+         
     }
 
+    void InitializeAbilities()
+    {
+        for (int i = 0; i < abilities.Length; i++)
+        {
+            if(abilities[i]!=null)
+            {
+                abilities[i].Initialize(this);
+            }
+        }
+    }
+
+    void TryToExecuteAbility(int AbilityIndex)
+    {
+        abilities[AbilityIndex].Activate();
+    }
     public ETeams GetTeam()
     {
         return team;

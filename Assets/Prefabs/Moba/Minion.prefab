@@ -564,6 +564,7 @@ MonoBehaviour:
   detectionArea: 4
   attackRange: 2
   attackCooldown: 1
+  hp: 10
   currentTarget: {fileID: 0}
 --- !u!195 &2008188198377600756
 NavMeshAgent:
@@ -598,9 +599,9 @@ CapsuleCollider:
   m_IsTrigger: 0
   m_Enabled: 1
   m_Radius: 0.5
-  m_Height: 1.31
+  m_Height: 2.9320896
   m_Direction: 1
-  m_Center: {x: 0, y: 0, z: 0}
+  m_Center: {x: 0, y: 0.8110448, z: 0}
 --- !u!1 &425747960580832721
 GameObject:
   m_ObjectHideFlags: 0
