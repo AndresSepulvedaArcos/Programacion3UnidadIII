@@ -7,6 +7,9 @@ public class PlayerControllerCommand : MonoBehaviour,IDamageable
 {
     //FIFO LIFO
 
+    public delegate void FNotifyAttributeChange(AttributeBase attributeChanged);
+    public static event FNotifyAttributeChange OnHpChange, OnManaChange;
+
     NavMeshAgent agent;
 
    
@@ -20,9 +23,16 @@ public class PlayerControllerCommand : MonoBehaviour,IDamageable
     bool basicIsInCooldown;
     public float basicCooldown = 0.5f;
 
-    public PlayerAbility[] abilities;
+    [Header("Attributes")]
+    public AttributeBase hp;
+    public AttributeBase mana;
 
+    public float manaRegen = 1f;
 
+    [Header("Abilities")]
+    public PlayerAbility[] abilities=new PlayerAbility[4];
+
+    Coroutine manaRegenCorutine;
     private void Awake()
     {
         agent = GetComponent<NavMeshAgent>();
@@ -30,6 +40,7 @@ public class PlayerControllerCommand : MonoBehaviour,IDamageable
     // Start is called before the first frame update
     void Start()
     {
+        InitializeAttributes();
         InitializeAbilities();
     }
 
@@ -107,15 +118,20 @@ public class PlayerControllerCommand : MonoBehaviour,IDamageable
          
     }
 
+    void InitializeAttributes()
+    {
+        hp = new AttributeBase(1700);
+        mana = new AttributeBase(400) ;
+
+    }
     void InitializeAbilities()
     {
-        for (int i = 0; i < abilities.Length; i++)
-        {
-            if(abilities[i]!=null)
-            {
-                abilities[i].Initialize(this);
-            }
-        }
+        Debug.Log(AbilityDatabase.instance);
+
+        FAbilityData abilityData = AbilityDatabase.instance.abilities[0];
+        abilities[abilityData.abilityIndex] =    Instantiate(abilityData.prefabAbility, transform).GetComponent<PlayerAbility>();
+        abilities[abilityData.abilityIndex].Initialize(this, abilityData);
+         
     }
 
     void TryToExecuteAbility(int AbilityIndex)
@@ -126,10 +142,21 @@ public class PlayerControllerCommand : MonoBehaviour,IDamageable
     {
         return team;
     }
-
+    //consume mana rage etctectec
+    public void ConsumeResource(float AmmountToConsume)
+    {
+        mana.Subtract(AmmountToConsume);
+        OnManaChange?.Invoke(mana);
+        if (manaRegenCorutine != null) return;
+           manaRegenCorutine=StartCoroutine(ManaRecovery());
+    }
     public void ApplyDamage(float Damage)
     {
-         
+        hp.Subtract(Damage);
+
+        OnHpChange?.Invoke(hp);
+
+
     }
 
     public void MakeBasicAttack(Transform attackTarget)
@@ -146,5 +173,16 @@ public class PlayerControllerCommand : MonoBehaviour,IDamageable
     {
         yield return new WaitForSeconds(basicCooldown);
         basicIsInCooldown = false;
+    }
+
+    IEnumerator ManaRecovery()
+    {
+        while(mana.currentValue<mana.baseValue)
+        {
+            mana.Add(1);
+            OnManaChange?.Invoke(mana);
+            yield return new WaitForSeconds(.5f);
+
+        }
     }
 }

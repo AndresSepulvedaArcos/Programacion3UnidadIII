@@ -8,7 +8,7 @@ public class ScriptableGeneric<T> : ScriptableObject where T:ScriptableObject
 {
     public static T instance;
 
-    private void Awake()
+    private void OnEnable()
     {
         instance = this as T;
 

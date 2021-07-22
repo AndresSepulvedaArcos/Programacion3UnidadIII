@@ -9,6 +9,7 @@ public class SkillInput : MonoBehaviour
     public static event FNotifySkillInput OnSkillInputPress;
 
     public Image cooldownBackground;
+    public Image icon;
     public int AbilityIndex;
 
 
@@ -16,21 +17,28 @@ public class SkillInput : MonoBehaviour
     {
         GetComponent<Button>().onClick.AddListener(() => { SkillPress(); });
         PlayerAbility.OnActivateAbility += PlayerAbility_OnActivateAbility;
+        PlayerAbility.OnSkillInitialized += PlayerAbility_OnSkillInitialized;
+    }
+
+    private void PlayerAbility_OnSkillInitialized(FAbilityData abilityDataReference)
+    {
+        icon.sprite = abilityDataReference.icon;
     }
 
     private void PlayerAbility_OnActivateAbility(int NotifyAbilityIndex, PlayerAbility playerAbilityReference)
     {
         if (NotifyAbilityIndex != AbilityIndex) return;
         cooldownBackground.fillAmount = 1f;
-        cooldownBackground.DOFillAmount(0, playerAbilityReference.cooldownTime);
+        cooldownBackground.DOFillAmount(0, playerAbilityReference.coolDown);
     }
 
     private void OnDisable()
     {
         PlayerAbility.OnActivateAbility -= PlayerAbility_OnActivateAbility;
+        PlayerAbility.OnSkillInitialized -= PlayerAbility_OnSkillInitialized;
 
     }
-     
+
 
     // Start is called before the first frame update
     void Start()

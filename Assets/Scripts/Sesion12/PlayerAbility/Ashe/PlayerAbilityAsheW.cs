@@ -7,11 +7,7 @@ public class PlayerAbilityAsheW : PlayerAbility
 
     public GameObject prefabAsheWArrow;
 
-    public override void Initialize(PlayerControllerCommand owner)
-    {
-        base.Initialize(owner);
-        AbilityIndex = 1;
-    }
+     
     public override void Activate()
     {
         if (!TryToCommitAbility()) return;
@@ -22,7 +18,7 @@ public class PlayerAbilityAsheW : PlayerAbility
 
         for (int i = 0; i < 8; i++)
         {
-            arrow= Instantiate(prefabAsheWArrow, transform.position, player.transform.rotation);
+            arrow= Instantiate(prefabAsheWArrow, player.transform.position, player.transform.rotation);
             float angle = -spreadAngle + i * angleStep;
             arrow.transform.Rotate(0,angle ,0);
             arrow.GetComponent<ProjectileBase>().ShootToDirection(arrow.transform.forward,player);
